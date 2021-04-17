@@ -92,7 +92,7 @@ stim = visual.TextStim(win)
 clock = core.Clock()
 def testUsingClock(code):
     times = []    # we'll fill this list with individual execution times
-    for trial in range(1000):
+    for _ in range(1000):
         clock.reset()
         eval(code)
         times += [clock.getTime()]

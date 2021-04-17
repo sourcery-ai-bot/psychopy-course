@@ -13,6 +13,7 @@ visual timing. See http://www.psychopy.org/general/timing/timing.html#timing
 Jonas Kristoffer Lindeløv, 2014. Revised in 2015.
 """
 
+
 # Initiate stimuli etc.
 from psychopy import core, visual, parallel, sound
 port = parallel.ParallelPort(address=0x0378)
@@ -37,7 +38,7 @@ win.flip()          # Draw blank screen on next flip. This is likely to arrive l
 
 # GOOD: using frames
 stim = visual.TextStim(win, text="Right on time!")
-for frameN in range(3): # Loop for 3 frames
+for _ in range(3): # Loop for 3 frames
     stim.draw()         # Draw stimulus to buffer on every frame
     win.flip()          # Flip screen on every frame: this is timed to actual update of monitor
 win.flip()              # Draw blank screen on next flip.: stimulus stops.
@@ -47,7 +48,7 @@ win.flip()              # Draw blank screen on next flip.: stimulus stops.
 Process heavy stuff in advance.
 """
 # BAD: doing process heavy stuff in timing critical periods
-for frameN in range(3):
+for _ in range(3):
     stim = visual.TextStim(win, text="Not on time!")  # Initialize a whole new stimulus: very heavy on resources and likely to cause a delay.
     stim.pos = (1,2)  # Or: set constant attributes on every loop that really remains constant throughout the trial.
     stim.color = 'green'
@@ -58,7 +59,7 @@ for frameN in range(3):
 stim = visual.TextStim(win, text="Right on time!")
 stim.pos = (1,2)
 stim.color = 'green'
-for frameN in range(3):
+for _ in range(3):
     stim.draw()
     win.flip()
 
@@ -68,7 +69,7 @@ Logging of stimuli should be initiated and terminated after win.flip() or sound.
 # BAD: logging visual events before win.flip(), i.e. out of sync with actual monitor update
 clock.reset()
 port.setData(255)
-for frameN in range(3):
+for _ in range(3):
     stim.draw()
     win.flip()              # Note that the first flip might occur many milliseconds after log/trigger
 port.setData(0)
@@ -84,7 +85,7 @@ port.setData(0)
 # GOOD: logging just after win.flip()
 win.callOnFlip(clock.reset)  # Set clock time to zero
 win.callOnFlip(port.setData, 255)  # Start trigger
-for frameN in range(3):
+for _ in range(3):
     stim.draw()
     win.flip()
 win.flip()                      # Show blank screen
@@ -108,14 +109,14 @@ Synchronizing visual, audio and trigger.
 # Play sound and show visual and time with trigger.
 # See next script if you want them (almost) perfectly synchronized.
 
-for i in range(20):
+for _ in range(20):
     # Do these things on first flip
     win.callOnFlip(beep_winsound.play)  # play sound! Takes less than 0.1 ms
     win.callOnFlip(port.setData, 15)  # takes less than 0.01 ms
     win.callOnFlip(clock.reset)  # takes less than 0.01 ms
 
     # Begin flip-loop
-    for frame in range(3):
+    for _ in range(3):
         stim.draw()
         win.flip()  # every 16.667 ms
     win.flip()
@@ -135,7 +136,7 @@ for i in range(20):
 frameInterval = 0.01667  # seconds
 visualDelay = 0.005  # seconds relative to trigger
 soundDelay = 0.007  # seconds relative to trigger
-for i in range(20):
+for _ in range(20):
     win.flip()  # to lock clock timing to win.flip before frame 0
     clock.reset()
     for frame in range(3):  # 50 ms on 60 Hz

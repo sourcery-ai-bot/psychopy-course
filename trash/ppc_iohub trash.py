@@ -12,7 +12,7 @@ class _ioClass(object):
 
         self._EventConstants = iohub.EventConstants
         existing_iohub = iohub.ioHubConnection.ACTIVE_CONNECTION
-        self._io = existing_iohub if existing_iohub else iohub.launchHubServer()
+        self._io = existing_iohub or iohub.launchHubServer()
 
         import numpy
         self._np = numpy
@@ -145,11 +145,11 @@ class Mouse(_ioClass):
         self._io.clearEvents('mouse')
         self._timeAtLastReset = self._core.getTime()
         self.mouse = self._io.devices.mouse
-        
+
         from psychopy import misc
         self._misc = misc
         self.win = win
-        self.units = units if units else win.units
+        self.units = units or win.units
         
     def _convertUnits(self, value, newUnit=None, oldUnit='pix'):
         """ Converts coordinates from one unit to another
@@ -206,7 +206,6 @@ class Mouse(_ioClass):
         See also Mouse.getCurrentPositionAndDelta.
         """
         baseTime = self._getBaseTime(clock)
-        trace = []
         events = self.mouse.getEvents(self._EventConstants.MOUSE_MOVE)
         """
         times = self._np.arange(events[0].time, events[-1].time, 1/float(rate))
@@ -215,10 +214,14 @@ class Mouse(_ioClass):
             pass
         """
 
-        for event in events:
-            trace += [(self._convertUnits(event.x_position, units), self._convertUnits(event.y_position, units), event.time - baseTime)]
-
-        return trace
+        return [
+            (
+                self._convertUnits(event.x_position, units),
+                self._convertUnits(event.y_position, units),
+                event.time - baseTime,
+            )
+            for event in events
+        ]
 
     def getButtons(self, buttonList=[], clock=None, releaseAsUnique=False, drag=False, units=None, clearEvents=True):
         """
@@ -325,7 +328,7 @@ class Mouse(_ioClass):
         else:
             wheelPosY = self.mouse.getScroll()
 
-        state = {
+        return {
             'pos': self._convertUnits(pos, units),
             'speed': posDelta,
             'leftDown': left,
@@ -333,5 +336,4 @@ class Mouse(_ioClass):
             'middleDown': middle,
             'scroll': wheelPosY
         }
-        return state
 

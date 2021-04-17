@@ -225,7 +225,7 @@ def make_trial_list(condition):
     for ori in ORIS.values():
         for pos in POSITIONS:
             for dur in FRAMES_STIM:
-                for rep in range(REPETITIONS):
+                for _ in range(REPETITIONS):
                     # Add a dictionary for every trial
                     trial_list += [{
                         'ori': ori,
@@ -274,18 +274,18 @@ def run_condition(condition):
         # ACTION: THIS IS THE TIMING CRITICAL PART
         # Fixation cue
         win.callOnFlip(clock.reset)
-        for frame in range(FRAMES_FIX):
+        for _ in range(FRAMES_FIX):
             stim_fix.draw()
             win.flip()
 
         # Stimulus
-        for frame in range(trial['duration']):
+        for _ in range(trial['duration']):
             stim_gabor.draw()
             stim_fix.draw()
             win.flip()
 
         # Mask
-        for frame in range(FRAMES_MASK):
+        for _ in range(FRAMES_MASK):
             for ori in ORIS.values():
                 stim_gabor.ori = ori
                 stim_gabor.draw()
